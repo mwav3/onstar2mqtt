@@ -1,5 +1,42 @@
 Sample configs for MQTT Home Assistant integration.
 
+### Commands
+
+#### example script yaml:
+```yaml
+alias: Car - Start Vehicle
+sequence:
+  - service: mqtt.publish
+    data:
+      topic: homeassistant/YOUR_CAR_VIN/command
+      payload: '{"command": "startVehicle"}'
+mode: single
+icon: 'mdi:car-electric'
+```
+
+#### Triger precondition via calendar
+````yaml
+alias: Car Precondition
+description: Precondition if group.family is home (ie, at least one person).
+trigger:
+  - platform: state
+    entity_id: calendar.YOUR_CAL_NAME
+    from: 'off'
+    to: 'on'
+condition:
+  - condition: state
+    entity_id: group.family
+    state: home
+  - condition: state
+    entity_id: calendar.YOUR_CAL_NAME
+    state: Bolt Start
+    attribute: message
+action:
+  - service: script.car_start_vehicle
+    data: {}
+mode: single
+````
+
 ### Location
 Unfortunately, the MQTT Device tracker uses a home/not_home state and the MQTT Json device tracker does not support
 the discovery schema so a manual entity configuration is required.
@@ -12,7 +49,7 @@ device_tracker:
       your_car_name: homeassistant/device_tracker/YOUR_CAR_VIN/getlocation/state
 ```
 
-script yaml:
+#### script yaml:
 ```yaml
 alias: Car - Location
 sequence:
@@ -23,25 +60,41 @@ sequence:
 mode: single
 icon: 'mdi:map-marker'
 ```
+### Automation:
+Create an automation to update the location whenever the odometer changes, instead of on a time interval.
+```alias: Update EV Location
+description: ""
+trigger:
+  - platform: state
+    entity_id:
+      - sensor.odometer_mi
+condition: []
+action:
+  - service: script.locate_bolt_ev
+    data: {}
+mode: single
+```
+
+#### Commands:
+[OnStarJS Command Docs](https://github.com/samrum/OnStarJS#commands)
+1. `getAccountVehicles`
+2. `startVehicle`
+3. `cancelStartVehicle`
+4. `alert`
+5. `cancelAlert`
+6. `lockDoor`
+7. `unlockDoor`
+8. `chargeOverride`
+9. `cancelChargeOverride`
+10. `getLocation`
+
 
 ### Lovelace Dashboard
 Create a new dashboard, or use the cards in your own view. The `mdi:car-electric` icon works well here.
 
 ![lovelace screenshot](images/lovelace.png)
 
-script yaml:
-```yaml
-alias: Car - Start Vehicle
-sequence:
-  - service: mqtt.publish
-    data:
-      topic: homeassistant/YOUR_CAR_VIN/command
-      payload: '{"command": "startVehicle"}'
-mode: single
-icon: 'mdi:car-electric'
-```
-
-dashboard yaml:
+#### dashboard yaml:
 ```yaml
 views:
   - badges: []
@@ -171,6 +224,3 @@ views:
         columns: 2
 title: Bolt EV
 ```
-
-TODO
-- Utility meter that resets for monthly LIFETIME ENERGY USED. This seems to only be updated after a full charge, along with other data points.

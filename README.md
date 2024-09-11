@@ -13,7 +13,7 @@ Collect the following information:
 1. MQTT server information: hostname, username, password
     1. If using TLS, define `MQTT_PORT` and `MQTT_TLS=true`
 
-Supply these values to the ENV vars below.
+Supply these values to the ENV vars below. The default data refresh interval is 30 minutes and can be overridden with ONSTAR_REFRESH with values in milliseconds.
 ### [Docker](https://hub.docker.com/r/michaelwoods/onstar2mqtt)
 
 ```shell
@@ -51,7 +51,7 @@ MQTT_PASSWORD=
 ```
 ### Node.js
 It's a typical node.js application, define the same environment values as described in the docker sections and run with:
-`npm run start`. Currently, this is only tested with Node.js 12.x.
+`npm run start`. Currently, this is only tested with Node.js 18.x.
 
 ### Home Assistant configuration templates
 MQTT auto discovery is enabled. For further integrations and screenshots see [HA-MQTT.md](HA-MQTT.md).
@@ -67,6 +67,3 @@ MQTT auto discovery is enabled. For further integrations and screenshots see [HA
 `npm version [major|minor|patch] -m "Version %s" && git push --follow-tags`
 
 Publish the release on GitHub to trigger a release build (ie, update 'latest' docker tag).
-
-## TODO
-1. Figure out metric->imperial unit handling
